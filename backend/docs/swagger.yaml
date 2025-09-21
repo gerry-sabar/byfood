@@ -1,0 +1,248 @@
+basePath: /
+definitions:
+  domain.Book:
+    properties:
+      author:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      isbn:
+        type: string
+      price:
+        type: number
+      publication_year:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.cleanupRequest:
+    properties:
+      operation:
+        description: '"redirection" | "canonical" | "all"'
+        type: string
+      url:
+        type: string
+    type: object
+  http.cleanupResponse:
+    properties:
+      processed_url:
+        type: string
+    type: object
+  http.validationPayload:
+    properties:
+      error:
+        type: string
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  ports.CreateBookInput:
+    properties:
+      author:
+        type: string
+      isbn:
+        type: string
+      price:
+        type: number
+      publication_year:
+        type: integer
+      title:
+        type: string
+    type: object
+  ports.ErrorResponse:
+    properties:
+      error:
+        example: not found
+        type: string
+    type: object
+  ports.UpdateBookInput:
+    properties:
+      author:
+        type: string
+      isbn:
+        type: string
+      price:
+        type: number
+      publication_year:
+        type: integer
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Simple Books API with URL cleanup helper.
+  title: ByFood Books API
+  version: "1.0"
+paths:
+  /books/:
+    get:
+      description: Returns all books
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Book'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+      summary: List books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New book
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ports.CreateBookInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/http.validationPayload'
+      summary: Create book
+      tags:
+      - books
+  /books/{id}/:
+    delete:
+      parameters:
+      - description: Book ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+      summary: Delete a book
+      tags:
+      - books
+    get:
+      parameters:
+      - description: Book ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+      summary: Get a book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Book ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: Partial update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ports.UpdateBookInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/http.validationPayload'
+      summary: Update a book
+      tags:
+      - books
+  /url/cleanup:
+    post:
+      consumes:
+      - application/json
+      description: 'operation: "redirection" | "canonical" | "all"'
+      parameters:
+      - description: Cleanup payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.cleanupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.cleanupResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ports.ErrorResponse'
+      summary: Normalize/cleanup a URL
+      tags:
+      - tools
+schemes:
+- http
+swagger: "2.0"
