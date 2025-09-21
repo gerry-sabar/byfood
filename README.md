@@ -22,7 +22,7 @@ Swagger documentation for endpoint usage example can be accessed at [http://loca
 
 ## Unit Test Execution
 
-To execute unit test in backend, please go to backend folder then execute command go `test ./...` this will test entire unit test file.
+To execute unit test in backend, please go to backend folder then execute command `go test ./...` this will test entire unit test file.
 
 ## Screenshots of working application
 
